@@ -1,0 +1,104 @@
+version: '3'
+services:
+  # ------------------------------- metasploit ------------------------------- #
+  metasploit:
+    image: metasploitframework/metasploit-framework:latest
+    container_name: metasploit
+    hostname: metasploit
+    restart: always
+    environment:
+      DATABASE_URL: postgres://postgres@msdb:5432/msf
+    ports:
+    - 4444:4444
+    volumes:
+    - $HOME/.msf4:/home/msf/.msf4
+    - /etc/localtime:/etc/localtime:ro
+
+  msdb:
+    image: postgres:10-alpine
+    container_name: msdb
+    hostname: msdb
+    restart: always
+    volumes:
+    - ./persistence/metasploit/msdb/pg_data:/var/lib/postgresql/data
+
+  # --------------------------------- webgoat -------------------------------- #
+  webgoat:
+    image: webgoat/webgoat-8.0
+    container_name: webgoat
+    hostname: webgoat
+    restart: always
+
+  webgoatdb:
+    container_name: webgoatdb
+    hostname: webgoatdb
+    restart: always
+    image: mariadb
+    command: mysqld --innodb-buffer-pool-size=20M --bind-address=0.0.0.0
+    ports:
+    - 3306:3306
+    volumes:
+    - ./persistence/webgoat/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: webgoat
+      MYSQL_DATABASE: webgoat
+      MYSQL_USER: webgoat
+      MYSQL_PASSWORD: webgoat
+
+  # ---------------------------------- dvwa ---------------------------------- #
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: dvwa
+    hostname: dvwa
+    restart: always
+    ports:
+    - 9020:80
+    # volumes:
+    # - ./persistence/dvwa/app:/app
+
+  dvwadb:
+    container_name: dvwadb
+    hostname: dvwadb
+    restart: always
+    image: mariadb
+    command: mysqld --innodb-buffer-pool-size=20M --bind-address=0.0.0.0
+    ports:
+    - 3306:3306
+    volumes:
+    - ./persistence/dvwa/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: dvwa
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: dvwa
+
+  # ---------------------------------- Redis --------------------------------- #
+
+  # ---------------------------- standard ---------------------------- #
+  # redis:
+  #   container_name: redis
+  #   hostname: redis
+  #   image: redis
+  #   restart: always
+  #   ports:
+  #   - 6379:6379
+
+  # ---------------------- with machine learning --------------------- #
+  # redis:
+  #   container_name: redis
+  #   hostname: redis
+  #   image: shaynativ/redis-ml
+  #   restart: always
+  #   ports:
+  #   - 6379:6379
+
+  # -------------------- Redis commander DB Management GUI ------------------- #
+  # redis-commander:
+  #   container_name: redis-commander
+  #   hostname: redis-commander
+  #   image: rediscommander/redis-commander:latest
+  #   restart: always
+  #   environment:
+  #   - REDIS_HOSTS=local:redis:6379
+  #   ports:
+  #   - 9081:8081

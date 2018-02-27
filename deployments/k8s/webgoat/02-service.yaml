@@ -1,0 +1,19 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: webgoat
+  namespace: webgoat
+  labels:
+    app: webgoat
+    component: webgoat-component
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+  selector:
+    app: webgoat
+    component: webgoat-component
+  type: NodePort

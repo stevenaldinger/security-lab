@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: dvwa
+  labels:
+    app: mysql
+    service: database
+spec:
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+        service: database
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: mysql:latest
+        args:
+        - mysqld
+        - --bind-address=0.0.0.0
+        ports:
+        - name: http
+          containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: root_pass
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: db_name
+        - name: MYSQL_USER
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: user_pass
+        # - name: MYSQL_ROOT_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-secret
+        #       key: root_pass
+        # - name: MYSQL_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-secret
+        #       key: user_pass
+        # - name: MYSQL_USER
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-secret
+        #       key: user
+        # - name: MYSQL_DATABASE
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: mysql-secret
+        #       key: db_name
+        # resources:
+        #   requests:
+        #     cpu: "0.01"
+        # volumeMounts:
+        # - name: mysql-cicd-data
+        #   mountPath: /var/lib/mysql
+      restartPolicy: Always
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: mysql-cicd-data
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     resources:
+  #       requests:
+  #         storage: 1Gi

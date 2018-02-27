@@ -1,0 +1,48 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: metasploit
+  namespace: metasploit
+  labels:
+    app: metasploit
+    component: metasploit-component
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metasploit
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      name: metasploit
+      namespace: metasploit
+      labels:
+        app: metasploit
+        component: metasploit-component
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: metasploit
+        image: metasploitframework/metasploit-framework:latest
+        command: ["tail", "-f", "/dev/null"]
+        # resources:
+        #   limits:
+        #     cpu: 0.1
+        #     memory: 100Mi
+        #   requests:
+        #     cpu: 0.01
+        #     memory: 10Mi
+        env:
+        - name: DATABASE_URL
+          value: "postgres://postgres@postgres:5432/msf"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP

@@ -1,0 +1,54 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: dvwa
+  namespace: dvwa
+  labels:
+    app: dvwa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dvwa
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      name: dvwa
+      namespace: dvwa
+      labels:
+        app: dvwa
+    spec:
+      containers:
+      - name: dvwa
+        image: vulnerables/web-dvwa:latest
+        # resources:
+        #   limits:
+        #     cpu: 0.1
+        #     memory: 100Mi
+        #   requests:
+        #     cpu: 0.01
+        #     memory: 10Mi
+        env:
+        - name: ENABLE_SSL
+          value: 'true'
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        # volumeMounts:
+        # - name: config-volume
+        #   # /kubernetes/config/proxy.conf.j2
+        #   mountPath: /kubernetes/config
+      restartPolicy: Always
+      # volumes:
+      # - name: config-volume
+      #   configMap:
+      #     # should contain "proxy.conf.j2" as one of the data items
+      #     name: dvwa-conf

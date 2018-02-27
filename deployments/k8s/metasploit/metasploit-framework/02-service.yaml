@@ -1,0 +1,19 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: metasploit
+  namespace: metasploit
+  labels:
+    app: metasploit
+    component: metasploit-component
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+  selector:
+    app: metasploit
+    component: metasploit-component
+  type: NodePort
