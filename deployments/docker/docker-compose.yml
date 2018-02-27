@@ -6,9 +6,10 @@ services:
     container_name: metasploit
     hostname: metasploit
     restart: always
-    command: tail -f /dev/null
+    entrypoint: sh -c 'tail -f /dev/null'
+    # command: tail -f /dev/null
     environment:
-      DATABASE_URL: postgres://postgres@msdb:5432/msf
+      DATABASE_URL: postgres://msf@msdb:5432/msf
     ports:
     - 4444:4444
     # volumes:
@@ -16,10 +17,16 @@ services:
     # - /etc/localtime:/etc/localtime:ro
 
   msdb:
-    image: postgres:10-alpine
     container_name: msdb
     hostname: msdb
+    image: postgres
     restart: always
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_USER: msf
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: msf
     volumes:
     - ./persistence/metasploit/msdb/pg_data:/var/lib/postgresql/data
 
@@ -39,7 +46,7 @@ services:
     image: mariadb
     command: mysqld --innodb-buffer-pool-size=20M --bind-address=0.0.0.0
     ports:
-    - 3306:3306
+    - 3307:3306
     volumes:
     - ./persistence/webgoat/db:/var/lib/mysql
     environment:
