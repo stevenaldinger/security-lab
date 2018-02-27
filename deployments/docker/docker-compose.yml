@@ -6,13 +6,14 @@ services:
     container_name: metasploit
     hostname: metasploit
     restart: always
+    command: tail -f /dev/null
     environment:
       DATABASE_URL: postgres://postgres@msdb:5432/msf
     ports:
     - 4444:4444
-    volumes:
-    - $HOME/.msf4:/home/msf/.msf4
-    - /etc/localtime:/etc/localtime:ro
+    # volumes:
+    # - $HOME/.msf4:/home/msf/.msf4
+    # - /etc/localtime:/etc/localtime:ro
 
   msdb:
     image: postgres:10-alpine
@@ -28,6 +29,8 @@ services:
     container_name: webgoat
     hostname: webgoat
     restart: always
+    ports:
+    - 8080:8080
 
   webgoatdb:
     container_name: webgoatdb
